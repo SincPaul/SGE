@@ -46,7 +46,7 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
 
         log_event(LOG_LEVEL_INFO, "Can now record into cmd buffer");
 
-        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline_layout, 0, 1, &vk_context->descriptor_set, 0, NULL);
+        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline_layout, 0, 1, &vk_context->descriptor_set[vk_context->so.current_frame], 0, NULL);
 
         vk_context->command_buffer_index = (vk_context->command_buffer_index + 1) % 3;
 
@@ -87,9 +87,26 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
                         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                         .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
                         .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-                        .clearValue = {.color = {0.0f, 0.0f, 0.0f, 0.0f}}
+                        .clearValue = {{0.0f, 0.0f, 0.0f, 0.0f}}
                 }
         };
+
+        //if (vk_context->so.current_frame == 2) {
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[0] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[1] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[2] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[3] = 0.0f;
+        //} else if (vk_context->so.current_frame == 1) {
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[0] = 1.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[1] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[2] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[3] = 1.0f;
+        //} else {
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[0] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[1] = 1.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[2] = 0.0f;
+        //        ((VkRenderingAttachmentInfoKHR*)render_info.pColorAttachments)->clearValue.color.float32[3] = 1.0f;
+        //}
 
         vkCmdBeginRendering(command_buffer, &render_info);
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline);
@@ -103,7 +120,7 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
                 .maxDepth = 1.0f
         };
         VkRect2D scissor = {
-                .offset = {0, 0},
+                .offset = {0.0, 0},
                 .extent = vk_context->sc.surface_capabilities.currentExtent
         };
         vkCmdSetViewport(command_buffer, 0, 1, &viewport);

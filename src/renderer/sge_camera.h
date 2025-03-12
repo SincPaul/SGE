@@ -28,6 +28,8 @@ SGE_RESULT sge_camera_move_forward(sge_render *render);
 SGE_RESULT sge_camera_move_left(sge_render *render);
 SGE_RESULT sge_camera_move_right(sge_render *render);
 SGE_RESULT sge_camera_move_backwards(sge_render *render);
+SGE_RESULT sge_camera_move_down(sge_render *render);
+SGE_RESULT sge_camera_move_up(sge_render *render);
 SGE_RESULT sge_camera_rotate(sge_render *render);
 
 SGE_RESULT sge_update_uniform_buffer(sge_render *render);

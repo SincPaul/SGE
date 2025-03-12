@@ -3,9 +3,9 @@
 layout (location = 0) in vec3 inPosition;
 
 layout (binding = 0) uniform UniformBufferObject {
-    m4 model;
-    m4 view;
-    m4 proj;
+    mat4 model;
+    mat4 view;
+    mat4 proj;
 } ubo;
 
 void main() {

@@ -82,10 +82,10 @@ typedef struct sge_vulkan_context {
         VkAllocationCallbacks           *sge_allocator;
 
         VkDescriptorPool                descriptor_pool;
-        VkDescriptorSet                 descriptor_set;
+        VkDescriptorSet                 descriptor_set[3];
         VkDescriptorSetLayout           descriptor_set_layout;
-        VkBuffer                        uniform_buffer;
-        VkDeviceMemory                  uniform_buffer_memory;
+        VkBuffer                        uniform_buffer[3];
+        VkDeviceMemory                  uniform_buffer_memory[3];
 } sge_vulkan_context;
 
 

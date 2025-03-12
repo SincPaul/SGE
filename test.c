@@ -108,6 +108,22 @@ int main(void) {
                         sge_camera_move_forward(render);
                 }
 
+                if (is_key_pressed(KEY_S)) {
+                        sge_camera_move_backwards(render);
+                }
+
+                if (is_key_pressed(KEY_D)) {
+                        sge_camera_move_right(render);
+                }
+
+                if (is_key_pressed(KEY_SPACE)) {
+                        sge_camera_move_up(render);
+                }
+
+                if (is_key_pressed(KEY_LSHIFT)) {
+                        sge_camera_move_down(render);
+                }
+
                 const struct mouse_pos current_mouse_pos = get_mouse_position();
 
                 //printf("Current Mouse Pos: x: %d, y: %d\n", current_mouse_pos.x, current_mouse_pos.y);

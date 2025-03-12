@@ -5,8 +5,14 @@
 #include "sge_math.h"
 
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "../core/logging.h"
+#include "../core/memory_control.h"
+
+int amount_chars_in_float(float num);
 
 vec3 sge_vec3_add(const vec3 a, const vec3 b) {
         const vec3 result = {a.x + b.x, a.y + b.y, a.z + b.z};
@@ -101,6 +107,52 @@ void sge_m4_multiply(m4 m_result, m4 m_a, m4 m_b) {
         }
 }
 
+void sge_m4_transpose(m4 matrix) {
+        for (int i = 0; i < 4; i++) {
+                for (int j = i + 1; j < 4; j++) {
+                        const float temp = matrix[i][j];
+                        matrix[i][j] = matrix[j][i];
+                        matrix[j][i] = temp;
+                }
+        }
+}
+
+void sge_m4_print(m4 matrix) {
+        int longest_num = 0;
+        char matrix_string[1024];
+        zero_memory(matrix_string, sizeof(matrix_string), 0);
+        for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                        int number_length = amount_chars_in_float(matrix[i][j]);
+                        if (number_length > longest_num) {
+                                longest_num = number_length;
+                        }
+                }
+        }
+
+        int box_width = (longest_num * 4) + (4 * 4);
+
+        for (int i = 0; i < box_width; ++i) {
+                snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "-");
+        }
+        snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "\n");
+        for (int i = 0; i < 4; ++i) {
+                snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "| %*.4f | %*.4f | %*.4f | %*.4f |\n",
+                        longest_num, matrix[i][0],
+                        longest_num, matrix[i][1],
+                        longest_num, matrix[i][2],
+                        longest_num, matrix[i][3]);
+                for (int j = 0; j < box_width; ++j) {
+                        snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "-");
+                }
+                snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "\n");
+        }
+        snprintf(matrix_string + strlen(matrix_string), sizeof(matrix_string), "\n");
+                        //printf("%f ", matrix[i][j]);
+
+        printf(matrix_string);
+}
+
 vec4 sge_m4_transform_vec4(m4 matrix, vec4 vec) {
         vec4 result;
         result.x = matrix[0][0] * vec.x + matrix[0][1] * vec.y + matrix[0][2] * vec.z + matrix[0][3] * vec.a;
@@ -108,4 +160,13 @@ vec4 sge_m4_transform_vec4(m4 matrix, vec4 vec) {
         result.z = matrix[2][0] * vec.x + matrix[2][1] * vec.y + matrix[2][2] * vec.z + matrix[2][3] * vec.a;
         result.a = matrix[3][0] * vec.x + matrix[3][1] * vec.y + matrix[3][2] * vec.z + matrix[3][3] * vec.a;
         return result;
+}
+
+int amount_chars_in_float(float num) {
+       //todo
+        //printf("%f\n", num);
+        if (num < 0 || num == -0) {
+                return 6;
+        }
+        return 6;
 }

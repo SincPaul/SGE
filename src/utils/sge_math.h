@@ -32,7 +32,8 @@ void sge_m4_set_rotate_x(m4 matrix, float angle);
 void sge_m4_set_rotate_y(m4 matrix, float angle);
 void sge_m4_set_rotate_z(m4 matrix, float angle);
 void sge_m4_multiply(m4 m_result, m4 m_a, m4 m_b);
+void sge_m4_transpose(m4 matrix);
+void sge_m4_print(m4 matrix);
 vec4 sge_m4_transform_vec4(m4 matrix, vec4 vec);
-
 
 #endif //SGE_MATH_H

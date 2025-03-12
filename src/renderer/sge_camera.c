@@ -6,25 +6,37 @@
 
 
 SGE_RESULT sge_camera_move_forward(sge_render *render) {
-        vec3 movement = {1, 0, 0};
+        vec3 movement = {0, 0, -1.0};
         render->camera.position = sge_vec3_add(render->camera.position, movement);
 
         return SGE_SUCCESS;
 }
 SGE_RESULT sge_camera_move_left(sge_render *render) {
-        vec3 movement = {0, -1, 0};
+        vec3 movement = {-1.0, 0, 0};
         render->camera.position = sge_vec3_add(render->camera.position, movement);
 
         return SGE_SUCCESS;
 }
 SGE_RESULT sge_camera_move_right(sge_render *render) {
-        vec3 movement = {0, 1, 0};
+        vec3 movement = {1.0, 0, 0};
         render->camera.position = sge_vec3_add(render->camera.position, movement);
 
         return SGE_SUCCESS;
 }
 SGE_RESULT sge_camera_move_backwards(sge_render *render) {
-        vec3 movement = {-1, 0, 0};
+        vec3 movement = {0, 0, 1};
+        render->camera.position = sge_vec3_add(render->camera.position, movement);
+
+        return SGE_SUCCESS;
+}
+SGE_RESULT sge_camera_move_up(sge_render *render) {
+        vec3 movement = {0, 1.0, 0};
+        render->camera.position = sge_vec3_add(render->camera.position, movement);
+
+        return SGE_SUCCESS;
+}
+SGE_RESULT sge_camera_move_down(sge_render *render) {
+        vec3 movement = {0, -1.0, 0};
         render->camera.position = sge_vec3_add(render->camera.position, movement);
 
         return SGE_SUCCESS;

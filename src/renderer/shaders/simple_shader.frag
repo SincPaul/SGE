@@ -3,5 +3,5 @@
 layout ( location = 0 ) out vec4 outColor;
 
 void main() {
-    outColor = vec4(0.8, 0.4, 0.2, 1.0);
+    outColor = vec4(0.5, 0.9, 0.2, 1.0);
 }
