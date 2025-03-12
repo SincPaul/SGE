@@ -1,0 +1,24 @@
+input control
+
+void enable_input_tracking();
+enabled input tracking, creates 2 buffers for current key states and last key states
+without enabling this everything else will return 0
+
+
+int is_key_down(keys key);
+returns 1 for duration of key held down
+
+
+int is_key_pressed(keys key);
+returns 1 on change from not pressed to pressed
+so only once
+
+
+struct mouse_pos get_mouse_position();
+returns a struct of mouse_pos of last known location of mouse
+
+struct mouse_pos {
+        int x;
+        int y;
+};
+

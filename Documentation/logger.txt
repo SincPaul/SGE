@@ -1,0 +1,39 @@
+Logger
+
+--initialize logger
+Example FileName: 27-02-2025_11-50-21.log
+
+int start_logger();
+returns 0 on success, 1 on error
+creates dir "logs/$year/$month/$day" if not exists
+creates file with timestamp of execution .log, see Example
+will also create temp buffer if LOG_LEVEL_INFO is enabled to log the memory consumption of the log buffer
+
+
+
+--log events
+Example Log Entry: [   INFO]  [27.02.2025 11:50:21]  Log started
+
+void log_event(log_level level, const char *message);
+creates a log message and inputs it into an 8kb big buffer to minimize read/write syscalls
+automatically writes to file if buffer is full
+disables logger if it fails to write to file
+calling log_event without start_logger(), will do nothing
+typedef enum log_level {
+    LOG_LEVEL_FATAL = 0,
+    LOG_LEVEL_ERROR = 1,
+    LOG_LEVEL_WARNING = 2,
+    LOG_LEVEL_INFO = 3,
+    LOG_LEVEL_DEBUG = 4,
+    LOG_LEVEL_TRACE = 5
+} log_level;
+if level is LOG_LEVEL_FATAL, will call terminate application, which calls stop_logger(), and then terminates application
+
+
+
+--stop logger
+int stop_logger();
+writes everything that is in the buffer to the file and stops logger
+if it fails to log, returns 1
+
+on exit also call terminate application, which calls stop_logger(), and then terminates application

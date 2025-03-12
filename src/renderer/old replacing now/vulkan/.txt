@@ -1,0 +1,30 @@
+pipeline
+
+input assembler
+-> nimmt vertex data von buffern
+-> so machen damit man damit arbeiten kann
+
+vertex shader
+-> transformiert vertex position zu screen pos
+-> gibt mehr daten für andere sachen
+
+tesselation shader
+-> mesh qualität verbessenr
+-> z.B je näher desto besser oder so
+
+gemometry shader
+-> mehr geometry erstellen
+
+rasterization
+-> erstllt fragmente aus den sachen die gegeben werden
+-> wird zu pixel elementen
+-> alles was nicht in screen space ist, wird weggeyeetet
+-> alles was hinter irgendwas liegt wird weggeyeetet
+
+fragment shader
+-> welcher framebuffer
+-> farbe/tiefe
+
+color blending
+-> mehrere framebuffer
+-> z.B transparency

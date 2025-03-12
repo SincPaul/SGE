@@ -1,0 +1,5 @@
+char *get_cwd();
+
+retuns current working dir, based on os
+needs to be freed using free_memory(ptr, memory_tag_input) by caller
+

@@ -1,0 +1,14 @@
+
+make filename save:
+void make_filename_save(char *filename);
+swaps illegal characters out
+
+
+creates a directory if not exists
+int create_directory_if_not_exists(const char *dir_path);
+
+
+uint32_t *read_file_as_binary(const char *filepath, size_t *codeSize);
+returns filecontent
+needs to be freed by caller
+//todo improve so no memory overflow

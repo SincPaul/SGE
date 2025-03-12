@@ -1,0 +1,76 @@
+memory control
+
+if info logging is enabled automatically logs all allocations
+
+
+-- allocate memory
+void *allocate_memory(size_t size, memory_tag tag);
+
+specify the size and a memory tag defined in memory_control.h
+
+typedef enum memory_tag {
+        MEMORY_TAG_UNKNOWN,
+        MEMORY_TAG_LOGGER,
+} memory_tag;
+
+automatically zeroes memory
+tracks the amount of allocated memory in linked lists
+
+returns ptr to allocated memory
+returns NULL if allocation or tracking fails
+
+
+
+-free memory
+void free_memory(void *ptr, memory_tag tag);
+
+removes memory that was allocated using allocated memory
+removes tracking
+if not allocated using allocated memory fails, if is not existing doesn't crash but logs error
+if memory usage is 0 removes tracking node
+
+
+--zero memory
+void *zero_memory(void *ptr, size_t size, int offset);
+
+sets size bytes of memory to 0 starting from offset in ptr
+currently no support for checking size or offset
+if u pass values that are out of bound will end in a seg fault
+//todo create dynamic check
+
+returns the gives ptr on success, NULL on error
+
+
+--copy memory
+void *copy_memory(void *dest_ptr, void *src_ptr, size_t size, int offset_dest, int offset_src);
+
+copies size amount of bytes from src pointer (starting from offset_src) to dest ptr (starting from offset_dest)
+currently no support for checking size or offset
+if u pass values that are out of bound will end in a seg fault
+//todo create dynamic check
+
+returns the gives dest ptr on success, NULL on error
+
+-- set memory
+void *set_memory(void *ptr, int value, size_t size, int offset);
+
+fills size bytes of memory with value starting at offset
+basically memset
+currently no support for checking size or offset
+if u pass values that are out of bound will end in a seg fault
+//todo create dynamic check
+
+
+void print_memory_usage_str();
+
+outputs formatted string of memory usage, sorted by usage desc
+Example:
+--------------------------------------------------
+|              Current Memory Usage              |
+--------------------------------------------------
+| Total Usage | 31639 Bytes                      |
+--------------------------------------------------
+| TITATEST 3 | 23256 Bytes                       |
+--------------------------------------------------
+| LOGGER     | 8287 Bytes                        |
+--------------------------------------------------

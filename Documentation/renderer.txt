@@ -1,0 +1,24 @@
+start by creating render struct, this will be the main way you interact with render api
+
+sge_render *render = sge_render_create(RENDER_API_VULKAN, &window);
+typedef enum render_api {
+        RENDER_API_VULKAN,
+        RENDER_API_DIRECTX,
+        RENDER_API_OPENGL
+} render_api
+
+typedef struct sge_render {
+        render_api      api;
+        void            *api_context;
+        SGE_window      *window;
+} sge_render;
+
+typedef struct SGE_window {
+        HWND hwnd;
+        HINSTANCE hinstance;
+} SGE_window;
+
+
+initialize your renderer by inputting all needed settings and the render struct
+returns SGE_TRUE on success else SGE_ERROR
+SGE_RESULT sge_render_initialize(sge_render *render, render_settings *settings);

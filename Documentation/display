@@ -1,0 +1,12 @@
+window_creation create_window(const int width,const int height,const char *window_name)
+creates a window based on os, currently only windows support
+
+returns window_creation, which includes the window handle and instance
+typedef struct window_creation {
+        HWND hwnd;
+        HINSTANCE hinstance;
+} window_creation;
+
+
+void update_frame(const int target_fps, const DWORD start_time_ms, HWND hwnd);
+updates frame, does everything like getting input capping to target fps, infinite if target fps is 0
