@@ -8,8 +8,8 @@
 #include "../utils/sge_math.h"
 
 typedef struct sge_camera {
-        vec3 position;
-        vec3 rotation;
+        vec3 position; //x,   y,     z
+        vec3 rotation; //yaw, pitch, roll
         float fov;
         float speed;
 } sge_camera;
@@ -31,6 +31,9 @@ SGE_RESULT sge_camera_move_backwards(sge_render *render);
 SGE_RESULT sge_camera_move_down(sge_render *render);
 SGE_RESULT sge_camera_move_up(sge_render *render);
 SGE_RESULT sge_camera_rotate(sge_render *render);
+SGE_RESULT sge_camera_rotate_x(sge_render *render, float angle);
+SGE_RESULT sge_camera_rotate_y(sge_render *render, float angle);
+SGE_RESULT sge_camera_rotate_z(sge_render *render, float angle);
 
 SGE_RESULT sge_update_uniform_buffer(sge_render *render);
 

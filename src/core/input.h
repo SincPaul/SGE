@@ -93,6 +93,7 @@ typedef enum keys {
     KEY_BACKTICK     = 0x60,   // '`'
 
     // Modifier keys
+        KEY_SHIFT       = 0x10, //windows shift
     KEY_LSHIFT       = 0xA0,   // Left Shift
     KEY_RSHIFT       = 0xA1,   // Right Shift
     KEY_LCTRL        = 0xA2,   // Left Control

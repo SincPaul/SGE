@@ -96,7 +96,7 @@ int main(void) {
 
                 if (is_key_down(KEY_A)) {
                         printf("HOLDING A\n");
-                        sge_camera_move_left(render);
+                        //sge_camera_move_left(render);
                 }
 
                 if (is_key_pressed(KEY_A)) {
@@ -120,8 +120,24 @@ int main(void) {
                         sge_camera_move_up(render);
                 }
 
-                if (is_key_pressed(KEY_LSHIFT)) {
+                if (is_key_pressed(KEY_SHIFT)) {
                         sge_camera_move_down(render);
+                }
+
+                if (is_key_pressed(KEY_ARROW_LEFT)) {
+                        sge_camera_rotate_y(render, -15);
+                }
+
+                if (is_key_pressed(KEY_ARROW_RIGHT)) {
+                        sge_camera_rotate_y(render, 15);
+                }
+
+                if (is_key_pressed(KEY_ARROW_UP)) {
+                        sge_camera_rotate_x(render, 15);
+                }
+
+                if (is_key_pressed(KEY_ARROW_DOWN)) {
+                        sge_camera_rotate_x(render, -15);
                 }
 
                 const struct mouse_pos current_mouse_pos = get_mouse_position();

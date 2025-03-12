@@ -30,18 +30,31 @@ SGE_RESULT sge_camera_move_backwards(sge_render *render) {
         return SGE_SUCCESS;
 }
 SGE_RESULT sge_camera_move_up(sge_render *render) {
-        vec3 movement = {0, 1.0, 0};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
-
-        return SGE_SUCCESS;
-}
-SGE_RESULT sge_camera_move_down(sge_render *render) {
         vec3 movement = {0, -1.0, 0};
         render->camera.position = sge_vec3_add(render->camera.position, movement);
 
         return SGE_SUCCESS;
 }
+SGE_RESULT sge_camera_move_down(sge_render *render) {
+        vec3 movement = {0, 1.0, 0};
+        render->camera.position = sge_vec3_add(render->camera.position, movement);
+
+        return SGE_SUCCESS;
+}
 SGE_RESULT sge_camera_rotate(sge_render *render);
+
+SGE_RESULT sge_camera_rotate_x(sge_render *render, float angle) {
+        render->camera.rotation.x += angle;
+        return SGE_SUCCESS;
+}
+SGE_RESULT sge_camera_rotate_y(sge_render *render, float angle) {
+        render->camera.rotation.y += angle;
+        return SGE_SUCCESS;
+}
+SGE_RESULT sge_camera_rotate_z(sge_render *render, float angle) {
+        render->camera.rotation.z += angle;
+        return SGE_SUCCESS;
+}
 
 
 SGE_RESULT sge_update_uniform_buffer(sge_render *render) {

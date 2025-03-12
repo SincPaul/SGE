@@ -24,6 +24,44 @@ vec3 sge_vec3_sub(const vec3 a, const vec3 b) {
         return result;
 }
 
+vec3 sge_vec3_normalize(vec3 vector) {
+        float magnitude = sqrt(squared(vector.x) + squared(vector.y) + squared(vector.z));
+
+        if (magnitude == 0) {
+                return (vec3){0.0, 0.0, 0.0};
+        }
+
+        return (vec3){
+                vector.x / magnitude,
+                vector.y / magnitude,
+                vector.z / magnitude
+        };
+}
+
+vec3 sge_vec3_cross(vec3 vector1, vec3 vector2) {
+        return (vec3){
+                vector1.y * vector2.z - vector1.z * vector2.y,
+                vector1.z * vector2.x - vector1.x * vector2.z,
+                vector1.x * vector2.y - vector1.y * vector2.x
+            };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void sge_m4_get_view_matrix(m4 matrix, vec3 left_vec3, vec3, vec3 up_vec3, vec3 vec3_forward_vec3, vec3 translation) {
+
+}
+
 void sge_m4_set_identity(m4 matrix) {
         for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
@@ -117,6 +155,22 @@ void sge_m4_transpose(m4 matrix) {
         }
 }
 
+void sge_m4_set_rotate(m4 matrix, vec3 rotation) {
+        m4 rx, ry, rz, temp;
+
+        sge_m4_set_identity(rx);
+        sge_m4_set_identity(ry);
+        sge_m4_set_identity(rz);
+        sge_m4_set_identity(temp);
+
+        sge_m4_set_rotate_x(rx, rotation.x);
+        sge_m4_set_rotate_y(ry, rotation.y);
+        sge_m4_set_rotate_z(rz, rotation.z);
+
+        sge_m4_multiply(temp, rx, ry);
+        sge_m4_multiply(matrix, temp, rz);
+}
+
 void sge_m4_print(m4 matrix) {
         int longest_num = 0;
         char matrix_string[1024];
@@ -169,4 +223,9 @@ int amount_chars_in_float(float num) {
                 return 6;
         }
         return 6;
+}
+
+
+size_t squared(size_t num) {
+        return num * num;
 }
