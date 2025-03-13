@@ -46,6 +46,50 @@ vec3 sge_vec3_cross(vec3 vector1, vec3 vector2) {
             };
 }
 
+vec3 sge_vec3_scale(vec3 vector1, float scale_factor) {
+        vec3 scaled = {
+                vector1.x * scale_factor,
+                vector1.y * scale_factor,
+                vector1.z * scale_factor,
+        };
+
+
+        return scaled;
+}
+
+vec3 sge_vec3_rotate_yaw_pitch(vec3 vector, vec3 rotation) {
+        vec3 rotated = sge_vec3_rotate_yaw(vector, rotation);
+        rotated = sge_vec3_rotate_pitch(rotated, rotation);
+        return rotated;
+}
+
+vec3 sge_vec3_rotate_pitch(vec3 vector, vec3 rotation) {
+        float radiant = -rotation.x * M_PI / 180.0f;
+        float c = cos(radiant);
+        float s = sin(radiant);
+
+        vec3 rotated = {
+                vector.x,
+                vector.y * c - vector.z * s,
+                vector.y * s + vector.z * c
+        };
+
+        return rotated;
+}
+
+vec3 sge_vec3_rotate_yaw(vec3 vector, vec3 rotation) {
+        float radiant = -rotation.y * M_PI / 180.0f;
+        float c = cos(radiant);
+        float s = sin(radiant);
+
+        vec3 rotated = {
+                vector.x * c + vector.z * s,
+                vector.y,
+                -vector.x * s + vector.z * c
+        };
+
+        return rotated;
+}
 
 
 

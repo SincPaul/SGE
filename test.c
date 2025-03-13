@@ -84,6 +84,23 @@ int main(void) {
         vec4 end_pos = sge_m4_transform_vec4(transformation_matrix, init_pos);
         printf("end pos: %f", end_pos.x);
 
+        sge_movement_settings movement_settings_horizontal = {
+                .mode = ROTATE_PITCH_AND_YAW,
+                .delta_speed = 1,
+        };
+        sge_movement_settings left_right = {
+                .mode = ROTATE_YAW_ONLY,
+                .delta_speed = 1,
+        };
+        sge_movement_settings sprint_settings_horizontal = {
+                .mode = ROTATE_PITCH_AND_YAW,
+                .delta_speed = 3,
+        };
+        sge_movement_settings movement_settings_vertical = {
+                .mode = ROTATE_NONE,
+                .delta_speed = 0.5
+        };
+
         while (!window_should_close()) {
                 //do stuff
                 timeBeginPeriod(1);
@@ -91,37 +108,41 @@ int main(void) {
 
                 //do everything in here
                 if (is_key_down(KEY_ESCAPE)) {
-                        printf("PRESSED ESCAPE\n");
+                        //printf("PRESSED ESCAPE\n");
                 }
 
                 if (is_key_down(KEY_A)) {
-                        printf("HOLDING A\n");
+                        //printf("HOLDING A\n");
                         //sge_camera_move_left(render);
                 }
 
-                if (is_key_pressed(KEY_A)) {
-                        printf("PRESSED A ONCE\n");
-                        sge_camera_move_left(render);
+                if (is_key_down(KEY_A)) {
+                        //printf("PRESSED A ONCE\n");
+                        sge_camera_move_left(render, left_right);
                 }
 
-                if (is_key_pressed(KEY_W)) {
-                        sge_camera_move_forward(render);
+                if (is_key_down(KEY_W)) {
+                        if (is_key_down(KEY_CTRL)) {
+                                sge_camera_move_forward(render, sprint_settings_horizontal);
+                        } else {
+                                sge_camera_move_forward(render, movement_settings_horizontal);
+                        }
                 }
 
-                if (is_key_pressed(KEY_S)) {
-                        sge_camera_move_backwards(render);
+                if (is_key_down(KEY_S)) {
+                        sge_camera_move_backwards(render, movement_settings_horizontal);
                 }
 
-                if (is_key_pressed(KEY_D)) {
-                        sge_camera_move_right(render);
+                if (is_key_down(KEY_D)) {
+                        sge_camera_move_right(render, left_right);
                 }
 
-                if (is_key_pressed(KEY_SPACE)) {
-                        sge_camera_move_up(render);
+                if (is_key_down(KEY_SPACE)) {
+                        sge_camera_move_up(render, movement_settings_vertical);
                 }
 
-                if (is_key_pressed(KEY_SHIFT)) {
-                        sge_camera_move_down(render);
+                if (is_key_down(KEY_SHIFT)) {
+                        sge_camera_move_down(render, movement_settings_vertical);
                 }
 
                 if (is_key_pressed(KEY_ARROW_LEFT)) {
@@ -140,7 +161,26 @@ int main(void) {
                         sge_camera_rotate_x(render, -15);
                 }
 
-                const struct mouse_pos current_mouse_pos = get_mouse_position();
+
+
+                mouse_pos delta_mouse_pos = get_delta_mouse_position();
+
+                sge_mouse_movement_settings mouse_movement_settings = {
+                        .mouse_delta_x = delta_mouse_pos.x,
+                        .mouse_delta_y = delta_mouse_pos.y,
+                        .sensitivity = 1,
+                        .flags = 0,
+                };
+
+                if (is_mouse_down(MBUTTON_RIGHT)) {
+                        hide_mouse();
+                        sge_camera_rotate(render, mouse_movement_settings);
+                }
+
+                if (was_mouse_down(MBUTTON_RIGHT)) {
+                        printf("MOUSE WAS DUWN\n\n\n\n\n");
+                        show_mouse();
+                }
 
                 //printf("Current Mouse Pos: x: %d, y: %d\n", current_mouse_pos.x, current_mouse_pos.y);
                 //draw_frame(vk_context);

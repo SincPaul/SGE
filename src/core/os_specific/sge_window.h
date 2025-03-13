@@ -30,5 +30,7 @@ typedef struct sge_window {
 sge_window *sge_window_create(const int width,const int height,const char *window_name);
 void sge_window_destroy(sge_window *window);
 void update_frame(const int target_fps, const DWORD start_time_ms, sge_window *window);
+void hide_mouse();
+void show_mouse();
 bool window_should_close();
 #endif //SGE_WINDOW_H

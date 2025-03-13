@@ -4,44 +4,107 @@
 
 #include "sge_camera.h"
 
+#include <stdio.h>
 
-SGE_RESULT sge_camera_move_forward(sge_render *render) {
-        vec3 movement = {0, 0, -1.0};
+extern size_t g_delta_time;
+
+SGE_RESULT sge_move(sge_render *render, vec3 direction, sge_movement_settings movement_settings) {
+        if (!g_delta_time) {
+                g_delta_time = 1.0f;
+        }
+
+
+        float delta_time = g_delta_time / 1000.0f;
+        if (delta_time > 0.05) {
+                delta_time = 0.05;
+        }
+        //printf("%f\n", delta_time);
+        vec3 movement = sge_vec3_scale(direction, movement_settings.delta_speed * delta_time);
+
+        if (movement_settings.mode == ROTATE_PITCH_AND_YAW) {
+                movement = sge_vec3_rotate_yaw_pitch(movement, render->camera.rotation);
+        } else if (movement_settings.mode == ROTATE_PITCH_ONLY) {
+                movement = sge_vec3_rotate_pitch(movement, render->camera.rotation);
+        } else if (movement_settings.mode == ROTATE_YAW_ONLY) {
+                movement = sge_vec3_rotate_yaw(movement, render->camera.rotation);
+        }
+
         render->camera.position = sge_vec3_add(render->camera.position, movement);
-
         return SGE_SUCCESS;
 }
-SGE_RESULT sge_camera_move_left(sge_render *render) {
+
+
+SGE_RESULT sge_camera_move_forward(sge_render *render, sge_movement_settings movement_settings) {
+        const vec3 movement = {0, 0, -1};
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
+
+        return move_result;
+}
+SGE_RESULT sge_camera_move_left(sge_render *render, sge_movement_settings movement_settings) {
         vec3 movement = {-1.0, 0, 0};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
 
-        return SGE_SUCCESS;
 }
-SGE_RESULT sge_camera_move_right(sge_render *render) {
+SGE_RESULT sge_camera_move_right(sge_render *render, sge_movement_settings movement_settings) {
         vec3 movement = {1.0, 0, 0};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
 
-        return SGE_SUCCESS;
+        return move_result;
 }
-SGE_RESULT sge_camera_move_backwards(sge_render *render) {
+SGE_RESULT sge_camera_move_backwards(sge_render *render, sge_movement_settings movement_settings) {
         vec3 movement = {0, 0, 1};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
 
-        return SGE_SUCCESS;
+        return move_result;
 }
-SGE_RESULT sge_camera_move_up(sge_render *render) {
+SGE_RESULT sge_camera_move_up(sge_render *render, sge_movement_settings movement_settings) {
         vec3 movement = {0, -1.0, 0};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
 
-        return SGE_SUCCESS;
+        return move_result;
 }
-SGE_RESULT sge_camera_move_down(sge_render *render) {
+SGE_RESULT sge_camera_move_down(sge_render *render, sge_movement_settings movement_settings) {
         vec3 movement = {0, 1.0, 0};
-        render->camera.position = sge_vec3_add(render->camera.position, movement);
+        SGE_RESULT move_result = sge_move(render, movement, movement_settings);
+
+        return move_result;
+}
+
+
+SGE_RESULT sge_camera_rotate(sge_render *render, sge_mouse_movement_settings movement_settings) {
+
+        if (movement_settings.mouse_delta_x == 0 && movement_settings.mouse_delta_y == 0) {
+                return SGE_SUCCESS;
+        }
+
+        if (movement_settings.flags & SGE_MOUSE_INVERT_Y) {
+                movement_settings.mouse_delta_y = -movement_settings.mouse_delta_y;
+        }
+        if (movement_settings.flags & SGE_MOUSE_INVERT_X) {
+                movement_settings.mouse_delta_x = -movement_settings.mouse_delta_x;
+        }
+
+        movement_settings.mouse_delta_y = -movement_settings.mouse_delta_y;
+
+
+        if (!movement_settings.sensitivity) {
+                movement_settings.sensitivity = 1;
+        }
+
+        //printf("MOUSE DELTA X: %f, Y: %f\n", movement_settings.mouse_delta_x, movement_settings.mouse_delta_y);
+        movement_settings.mouse_delta_x *= movement_settings.sensitivity;
+        movement_settings.mouse_delta_y *= movement_settings.sensitivity;
+
+        float angle_x = movement_settings.mouse_delta_x / render->window->width * 360.0f;
+        float angle_y = movement_settings.mouse_delta_y / render->window->height * 360.0f;
+
+        //printf("ANGLE X: %f, ANGLE Y: %f\n", angle_x, angle_y);
+
+        render->camera.rotation.y += angle_x;
+        render->camera.rotation.x += angle_y;
 
         return SGE_SUCCESS;
 }
-SGE_RESULT sge_camera_rotate(sge_render *render);
 
 SGE_RESULT sge_camera_rotate_x(sge_render *render, float angle) {
         render->camera.rotation.x += angle;
@@ -56,6 +119,13 @@ SGE_RESULT sge_camera_rotate_z(sge_render *render, float angle) {
         return SGE_SUCCESS;
 }
 
+SGE_RESULT sge_camera_lock_mouse(sge_render *render) {
+        hide_mouse(render);
+}
+
+SGE_RESULT sge_camera_unlock_mouse(sge_render *render) {
+        show_mouse(render);
+}
 
 SGE_RESULT sge_update_uniform_buffer(sge_render *render) {
         if (!render->sge_interface->update_uniform(render)) {

@@ -25,6 +25,10 @@ vec3 sge_vec3_add(vec3 a, vec3 b);
 vec3 sge_vec3_sub(vec3 a, vec3 b);
 vec3 sge_vec3_normalize(vec3 vector);
 vec3 sge_vec3_cross(vec3 vector1, vec3 vector2);
+vec3 sge_vec3_scale(vec3 vector1, float scale_factor);
+vec3 sge_vec3_rotate_yaw_pitch(vec3 vector1, vec3 rotation);
+vec3 sge_vec3_rotate_pitch(vec3 vector, vec3 rotation);
+vec3 sge_vec3_rotate_yaw(vec3 vector1, vec3 rotation);
 
 
 void sge_m4_get_view_matrix(m4 matrix, vec3 left_vec3, vec3, vec3 up_vec3, vec3 vec3_forward_vec3, vec3 translation);

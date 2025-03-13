@@ -8,7 +8,10 @@
 
 extern int *key_states;
 extern int *last_key_states;
+extern int *mouse_states;
+extern int *last_mouse_states;
 extern struct mouse_pos last_mouse_pos;
+extern struct mouse_pos delta_mouse_pos;
 
 typedef enum keys {
     // Control characters (0x00-0x1F)
@@ -94,6 +97,7 @@ typedef enum keys {
 
     // Modifier keys
         KEY_SHIFT       = 0x10, //windows shift
+        KEY_CTRL        = 0x11,
     KEY_LSHIFT       = 0xA0,   // Left Shift
     KEY_RSHIFT       = 0xA1,   // Right Shift
     KEY_LCTRL        = 0xA2,   // Left Control
@@ -148,12 +152,17 @@ typedef enum keys {
 
 } keys;
 
+typedef enum mouse_buttons {
+        MBUTTON_LEFT   = 0x01,
+        MBUTTON_RIGHT  = 0x02,
+        MBUTTON_MIDDLE = 0x04
+} mouse_buttons;
 
 
-struct mouse_pos {
+typedef struct mouse_pos {
         int x;
         int y;
-};
+} mouse_pos;
 
 //void on_button_press(keys key, event event);
 
@@ -161,9 +170,14 @@ int is_key_down(keys key); // returns 1 if pressed
 int is_key_pressed(keys key); //returns 1 only if it changed from not pressed to pressed
 int is_shift_active();
 
+int is_mouse_down(mouse_buttons buttons);
+int was_mouse_down(mouse_buttons buttons);
+int is_mouse_pressed(mouse_buttons button);
+
 void update_key_states();
 
-struct mouse_pos get_mouse_position();
+mouse_pos get_mouse_position();
+mouse_pos get_delta_mouse_position();
 
 void enable_input_tracking();
 
