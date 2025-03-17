@@ -37,6 +37,10 @@ mouse_pos get_mouse_position() {
         return last_mouse_pos;
 }
 
+mouse_pos get_window_mouse_pos(sge_render *render, mouse_pos screen_pos) {
+        return screen_to_window(render, screen_pos);
+}
+
 mouse_pos get_delta_mouse_position() {
         return delta_mouse_pos;
 }

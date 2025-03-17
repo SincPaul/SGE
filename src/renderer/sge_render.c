@@ -56,6 +56,8 @@ SGE_RESULT sge_render_initialize(sge_render *render, sge_render_settings *render
              return SGE_ERROR;
         }
 
+        log_event(LOG_LEVEL_INFO, "FINISHED RENDER INITIALIZATION");
+
         return SGE_SUCCESS;
 }
 
@@ -83,14 +85,53 @@ SGE_RESULT sge_end_frame(sge_render *render) {
         return SGE_SUCCESS;
 }
 
-//todo dynamic array
-SGE_RESULT sge_add_renderable(sge_render *render, sge_renderable *renderable) {
-        render->sge_renderables = *renderable;
-        render->sge_renderables_count = 1;
 
+SGE_RESULT sge_create_buffer(sge_render *render, void **buffer_ptr) {
+        if (render->sge_interface->create_buffer(render, buffer_ptr) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
 
         return SGE_SUCCESS;
 }
+
+SGE_RESULT sge_allocate_buffer(sge_render *render, void **memory_ptr, void *buffer) {
+        if (render->sge_interface->allocate_buffer_memory(render, memory_ptr, buffer) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
+
+        return SGE_SUCCESS;
+}
+
+SGE_RESULT sge_create_descriptor_pool(sge_render *render, void *pool_ptr) {
+        if (render->sge_interface->create_descriptor_pool(render, pool_ptr) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
+
+        return SGE_SUCCESS;
+}
+
+SGE_RESULT sge_allocate_descriptor_set(sge_render *render, void *descriptor_ptr, void *layout_ptr, void *descriptor_pool) {
+        if (render->sge_interface->allocate_descriptor_set(render, descriptor_ptr, layout_ptr, descriptor_pool) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
+
+        return SGE_SUCCESS;
+}
+
+SGE_RESULT sge_update_descriptor_set(sge_render *render, sge_uniform_buffer_type *buffer) {
+        if (render->sge_interface->update_descriptor_set(render, buffer) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
+        return SGE_SUCCESS;
+}
+//todo dynamic array
+//SGE_RESULT sge_add_renderable(sge_render *render, sge_renderable *renderable) {
+//        render->sge_renderables = *renderable;
+//        render->sge_renderables_count = 1;
+
+
+//        return SGE_SUCCESS;
+//}
 
 sge_mesh *create_logo_mesh(sge_render *render) {
 

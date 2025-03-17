@@ -26,23 +26,15 @@ add_library(SGE
         src/renderer/vulkan_renderer/sge_vulkan_command.c
         src/renderer/vulkan_renderer/sge_vulkan_allocator.c
         src/renderer/vulkan_renderer/sge_vulkan_sync.c
-        src/renderer/vulkan_renderer/sge_vulkan_sync.h
         src/renderer/vulkan_renderer/sge_vulkan_pipeline.c
-        src/renderer/vulkan_renderer/sge_vulkan_pipeline.h
         src/renderer/vulkan_renderer/sge_vulkan_shader.c
-        src/renderer/vulkan_renderer/sge_vulkan_shader.h
         src/renderer/vulkan_renderer/sge_vulkan_draw.c
-        src/renderer/vulkan_renderer/sge_vulkan_draw.h
         src/renderer/vulkan_renderer/sge_vulkan_resize.c
-        src/renderer/vulkan_renderer/sge_vulkan_resize.h
         src/renderer/sge_camera.c
-        src/renderer/sge_camera.h
         src/renderer/vulkan_renderer/sge_vulkan_buffer.c
-        src/renderer/vulkan_renderer/sge_vulkan_buffer.h
         src/renderer/vulkan_renderer/sge_vulkan_uniform.c
-        src/renderer/vulkan_renderer/sge_vulkan_uniform.h
         src/renderer/vulkan_renderer/sge_vulkan_descriptor.c
-        src/renderer/vulkan_renderer/sge_vulkan_descriptor.h
+        src/renderer/sge_region.c
 )
 
 add_executable(TEST test.c

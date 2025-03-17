@@ -42,6 +42,7 @@ VkShaderModule sge_vulkan_shader_load(sge_render *render, const char *shader_nam
         VkShaderModule shaderModule;
         if (vkCreateShaderModule(vk_context->device, &createInfo, vk_context->sge_allocator, &shaderModule) != VK_SUCCESS) {
                 log_event(LOG_LEVEL_FATAL, "Failed to create shader module from file: %s", full_filepath);
+                return NULL;
         }
 
         free_memory(code, MEMORY_TAG_INPUT);

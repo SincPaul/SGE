@@ -4,6 +4,8 @@
 
 #include "sge_vulkan_draw.h"
 
+#include <stdio.h>
+
 #include "sge_vulkan_resize.h"
 #include "../../core/logging.h"
 
@@ -44,9 +46,8 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
                 log_event(LOG_LEVEL_FATAL, "Failed to begin cmd buffer recording: %d", rec_begin_result);
         }
 
-        log_event(LOG_LEVEL_INFO, "Can now record into cmd buffer");
+        //log_event(LOG_LEVEL_INFO, "Can now record into cmd buffer");
 
-        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline_layout, 0, 1, &vk_context->descriptor_set[vk_context->so.current_frame], 0, NULL);
 
         vk_context->command_buffer_index = (vk_context->command_buffer_index + 1) % 3;
 
@@ -111,31 +112,80 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
         vkCmdBeginRendering(command_buffer, &render_info);
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline);
 
-        VkViewport viewport = {
-                .x = 0.0f,
-                .y = 0.0f,
-                .width = (float)vk_context->sc.surface_capabilities.currentExtent.width,
-                .height = (float)vk_context->sc.surface_capabilities.currentExtent.height,
-                .minDepth = 0.0f,
-                .maxDepth = 1.0f
-        };
-        VkRect2D scissor = {
-                .offset = {0.0, 0},
-                .extent = vk_context->sc.surface_capabilities.currentExtent
-        };
-        vkCmdSetViewport(command_buffer, 0, 1, &viewport);
-        vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+        for (int i = 0; i < render->region_count; ++i) {
+                sge_region *region = render->regions[i];
 
-        for (int i = 0; i < render->sge_renderables_count; ++i) {
-                log_event(LOG_LEVEL_INFO, "rendering renderable");
-                sge_renderable *renderable = &render->sge_renderables;
+                float height = region->viewport->height;
+                float width = region->viewport->width;
 
-                VkBuffer vertex_buffers[] = { renderable->mesh->vertex_buffer };
-                VkDeviceSize offsets[] = { 0 };
+                if (width == -1000) {
+                        width = vk_context->sc.surface_capabilities.currentExtent.width;
+                }
+                if (height == -1000) {
+                        height = vk_context->sc.surface_capabilities.currentExtent.height;
+                }
 
-                vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
-                vkCmdDraw(command_buffer, renderable->mesh->vertex_count, 1, 0, 0);
+                //printf("H: %f, W: %f, x: %f, y: %f, maxd: %f, mind: %f\n", height, width, region->viewport->x, region->viewport->y, region->viewport->max_depth, region->viewport->min_depth);
+
+                VkDescriptorSet desc_set = (VkDescriptorSet)region->uniform_buffers[vk_context->so.current_frame].descriptor;
+                vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vk_context->pipeline_layout,
+                                        0, 1, &desc_set, 0, NULL);
+
+                VkViewport viewport = {
+                        .height = height,
+                        .width = width,
+                        .x = region->viewport->x,
+                        .y = region->viewport->y,
+                        .maxDepth = region->viewport->max_depth,
+                        .minDepth = region->viewport->min_depth,
+                };
+
+                VkRect2D  scissor = {
+                        .extent = { width,height },
+                        .offset = { region->scissor->offset_x, region->scissor->offset_y }
+                };
+
+                vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+                vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+                for (int r = 0; r < region->renderable_count; ++r) {
+                        sge_renderable *renderable = region->renderables[r];
+
+                        VkBuffer vertex_buffer[] = {renderable->mesh->vertex_buffer};
+                        VkDeviceSize offsets[] = {0};
+
+                        vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffer, offsets);
+                        vkCmdDraw(command_buffer, renderable->mesh->vertex_count, 1, 0, 0);
+
+
+                }
+
         }
+
+        //VkViewport viewport = {
+        //        .x = 0.0f,
+        //        .y = 0.0f,
+        //        .width = (float)vk_context->sc.surface_capabilities.currentExtent.width,
+        //        .height = (float)vk_context->sc.surface_capabilities.currentExtent.height,
+        //        .minDepth = 0.0f,
+        //        .maxDepth = 1.0f
+        //};
+        //VkRect2D scissor = {
+        //        .offset = {0.0, 0},
+        //        .extent = vk_context->sc.surface_capabilities.currentExtent
+        //};
+        //vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+        //vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+        //for (int i = 0; i < render->sge_renderables_count; ++i) {
+        //        log_event(LOG_LEVEL_INFO, "rendering renderable");
+        //        sge_renderable *renderable = &render->sge_renderables;
+//
+        //        VkBuffer vertex_buffers[] = { renderable->mesh->vertex_buffer };
+        //        VkDeviceSize offsets[] = { 0 };
+//
+        //        vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+        //        vkCmdDraw(command_buffer, renderable->mesh->vertex_count, 1, 0, 0);
+        //}
         vkCmdEndRendering(command_buffer);
 
         barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -153,7 +203,7 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
                 log_event(LOG_LEVEL_FATAL, "Failed to end cmd buffer recording: %d", rec_end_result);
         }
 
-        log_event(LOG_LEVEL_INFO, "Finished cmd buffer recording");
+        //log_event(LOG_LEVEL_INFO, "Finished cmd buffer recording");
 
         VkSubmitInfo submit_info = {
                 .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,

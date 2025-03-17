@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-const int LOG_BUFFER_SIZE = 8192;
+const int LOG_BUFFER_SIZE = 128000;
 const int TEMP_BUFFER_SIZE = 2048;
 
 bool is_debug_2 = true;

@@ -10,6 +10,8 @@
 
 #include "../utils/sge_math.h"
 
+typedef struct sge_region sge_region;
+
 typedef struct sge_camera {
         vec3 position; //x,   y,     z
         vec3 rotation; //yaw, pitch, roll
@@ -17,6 +19,13 @@ typedef struct sge_camera {
         float speed;
 } sge_camera;
 
+typedef struct sge_uniform_buffer_object {
+        m4 model;
+        m4 view;
+        m4 proj;
+} sge_uniform_buffer_object;
+
+#include "sge_region.h"
 #include "sge_render.h"
 
 //typedef enum {
@@ -43,29 +52,24 @@ typedef struct sge_mouse_movement_settings {
         unsigned int flags;
 } sge_mouse_movement_settings;
 
-typedef struct sge_uniform_buffer_object {
-        m4 model;
-        m4 view;
-        m4 proj;
-} sge_uniform_buffer_object;
 
 
-SGE_RESULT sge_move(sge_render *render, vec3 direction, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_forward(sge_render *render, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_left(sge_render *render, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_right(sge_render *render, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_backwards(sge_render *render, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_down(sge_render *render, sge_movement_settings movement_settings);
-SGE_RESULT sge_camera_move_up(sge_render *render, sge_movement_settings movement_settings);
+SGE_RESULT sge_move(sge_render *render, sge_region *move_region, vec3 direction, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_forward(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_left(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_right(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_backwards(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_down(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
+SGE_RESULT sge_camera_move_up(sge_render *render, sge_region *move_region, sge_movement_settings movement_settings);
 
-SGE_RESULT sge_camera_rotate(sge_render *render, sge_mouse_movement_settings movement_settings);
-SGE_RESULT sge_camera_rotate_x(sge_render *render, float angle);
-SGE_RESULT sge_camera_rotate_y(sge_render *render, float angle);
-SGE_RESULT sge_camera_rotate_z(sge_render *render, float angle);
+SGE_RESULT sge_camera_rotate(sge_render *render, sge_region *move_region, sge_mouse_movement_settings movement_settings);
+SGE_RESULT sge_camera_rotate_x(sge_render *render, sge_region *move_region, float angle);
+SGE_RESULT sge_camera_rotate_y(sge_render *render, sge_region *move_region, float angle);
+SGE_RESULT sge_camera_rotate_z(sge_render *render, sge_region *move_region, float angle);
 
 SGE_RESULT sge_camera_lock_mouse(sge_render *render);
 
-SGE_RESULT sge_update_uniform_buffer(sge_render *render);
+SGE_RESULT sge_update_uniform_buffer(sge_render *render, sge_region *region);
 
 
 #endif //SGE_CAMERA_H

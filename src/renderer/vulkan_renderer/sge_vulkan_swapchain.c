@@ -10,7 +10,11 @@
 SGE_RESULT sge_vulkan_swapchain_create(sge_render *render) {
         sge_vulkan_context *vk_context = (sge_vulkan_context*)render->api_context;
 
+        uint32_t old_width = vk_context->sc.surface_capabilities.currentExtent.width;
+        uint32_t old_height = vk_context->sc.surface_capabilities.currentExtent.height;
+
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vk_context->physical_device, vk_context->surface, &vk_context->sc.surface_capabilities);
+        sge_region_resize_auto_resizing_regions(render, old_width, old_height, vk_context->sc.surface_capabilities.currentExtent.width, vk_context->sc.surface_capabilities.currentExtent.height);
         uint32_t format_count;
         vkGetPhysicalDeviceSurfaceFormatsKHR(vk_context->physical_device, vk_context->surface, &format_count, NULL);
         VkSurfaceFormatKHR *formats = allocate_memory(format_count * sizeof(VkSurfaceFormatKHR), MEMORY_TAG_VULKAN);
@@ -32,7 +36,7 @@ SGE_RESULT sge_vulkan_swapchain_create(sge_render *render) {
         create_info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
         create_info.clipped = VK_TRUE;
 
-        if (vkCreateSwapchainKHR(vk_context->device, &create_info, NULL, &vk_context->swapchain) != VK_SUCCESS) {
+        if (vkCreateSwapchainKHR(vk_context->device, &create_info, vk_context->sge_allocator, &vk_context->swapchain) != VK_SUCCESS) {
                 log_event(LOG_LEVEL_FATAL, "failed to create swapchain");
                 return SGE_ERROR;
         }

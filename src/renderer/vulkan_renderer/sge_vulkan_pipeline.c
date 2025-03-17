@@ -27,8 +27,6 @@ SGE_RESULT sge_vulkan_pipeline_create(sge_render *render) {
                 log_event(LOG_LEVEL_FATAL, "failed getting shaders");
         }
 
-        sge_renderable *sge_logo = create_logo_renderable(render);
-
         VkPipelineShaderStageCreateInfo vertex_shader_stage_create_info = {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .pNext = 0,

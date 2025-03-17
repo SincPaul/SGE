@@ -50,6 +50,22 @@ mouse_pos get_window_center(HWND hwnd) {
         return (mouse_pos){0, 0};  // Return (0,0) on failure
 }
 
+mouse_pos screen_to_window(sge_render *render, mouse_pos screen_pos) {
+        HWND hwnd = render->window->handle.hwnd;
+        POINT screen_point = {
+                .x = screen_pos.x,
+                .y = screen_pos.y
+        };
+        ScreenToClient(hwnd, &screen_point);
+
+        mouse_pos window_pos = {
+                .x = screen_point.x,
+                .y = screen_point.y
+        };
+
+        return window_pos;
+}
+
 
 
 void set_window_title(HWND hwnd, char *title, ...) {

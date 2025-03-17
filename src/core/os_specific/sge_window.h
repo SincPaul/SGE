@@ -6,6 +6,11 @@
 #define SGE_WINDOW_H
 #include <stdbool.h>
 #include <windows.h>
+#include "../input.h"
+#include "../../renderer/sge_render.h"
+
+typedef struct mouse_pos mouse_pos;
+typedef struct sge_render sge_render;
 
 
 #ifdef WIN32
@@ -22,9 +27,9 @@
 #endif
 
 typedef struct sge_window {
-        sge_platform_handle handle;
-        int width;
-        int height;
+        sge_platform_handle     handle;
+        int                     width;
+        int                     height;
 } sge_window;
 
 sge_window *sge_window_create(const int width,const int height,const char *window_name);
@@ -33,4 +38,5 @@ void update_frame(const int target_fps, const DWORD start_time_ms, sge_window *w
 void hide_mouse();
 void show_mouse();
 bool window_should_close();
+mouse_pos screen_to_window(sge_render *render, mouse_pos screen_pos);
 #endif //SGE_WINDOW_H

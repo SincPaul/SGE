@@ -61,28 +61,62 @@ int main(void) {
 
         print_memory_usage_str();
 
+        sge_region_settings region_setting_3d = {
+                .auto_update = true,
+                .auto_scale_on_resize = true,
+                .auto_reposition_on_resize = false,
+                .height = SGE_REGION_FULL_DIMENSION,
+                .width = SGE_REGION_FULL_DIMENSION,
+                .offset_x = 0,
+                .offset_y = 0,
+                .min_depth = 0.0f,
+                .max_depth = 0.0f,
+                .z_index = 0,
+        };
+
+        sge_region *main_region = sge_region_create(render, &region_setting_3d);
+
         sge_renderable *logo_renderable = create_logo_renderable(render);
-        sge_add_renderable(render, logo_renderable);
+        //sge_add_renderable(render, logo_renderable);
+
+        sge_region_add_renderable(main_region, logo_renderable);
+
+        sge_region_settings second_setting_3d = {
+                .auto_update = true,
+                .auto_scale_on_resize = true,
+                .auto_reposition_on_resize = true,
+                .height = 200,
+                .width = 200,
+                .offset_x = 0,
+                .offset_y = 0,
+                .min_depth = 0.0f,
+                .max_depth = 1.0f,
+                .z_index = 1,
+        };
+
+        sge_region *secondary_region = sge_region_create(render, &second_setting_3d);
+
+        sge_region_add_renderable(secondary_region, logo_renderable);
 
         //m4 test_matrix =
-        m4 transformation_matrix;
-        vec3 translation_vector = {1.5, 1.0, 1.5};
-        m4 translation_matrix;
-        sge_m4_set_identity(translation_matrix);
-        m4 x_rotation_matrix;
-        sge_m4_set_identity(x_rotation_matrix);
-        m4 y_rotation_matrix;
-        sge_m4_set_identity(y_rotation_matrix);
-        sge_m4_set_translate(translation_matrix, translation_vector);
-        sge_m4_set_rotate_x(x_rotation_matrix, 180);
-        sge_m4_set_rotate_y(y_rotation_matrix, 90);
-        m4 temp;
-        sge_m4_multiply(temp, translation_matrix, x_rotation_matrix);
-        sge_m4_multiply(transformation_matrix, temp, y_rotation_matrix);
-
-        vec4 init_pos = {0, 1, 0, 1};
-        vec4 end_pos = sge_m4_transform_vec4(transformation_matrix, init_pos);
-        printf("end pos: %f", end_pos.x);
+        //m4 transformation_matrix;
+        //vec3 translation_vector = {1.5, 1.0, 1.5};
+        //m4 translation_matrix;
+        //sge_m4_set_identity(translation_matrix);
+        //m4 x_rotation_matrix;
+        //sge_m4_set_identity(x_rotation_matrix);
+        //m4 y_rotation_matrix;
+        //sge_m4_set_identity(y_rotation_matrix);
+        //sge_m4_set_translate(translation_matrix, translation_vector);
+        //sge_m4_set_rotate_x(x_rotation_matrix, 180);
+        //sge_m4_set_rotate_y(y_rotation_matrix, 90);
+        //m4 temp;
+        //sge_m4_multiply(temp, translation_matrix, x_rotation_matrix);
+        //sge_m4_multiply(transformation_matrix, temp, y_rotation_matrix);
+//
+        //vec4 init_pos = {0, 1, 0, 1};
+        //vec4 end_pos = sge_m4_transform_vec4(transformation_matrix, init_pos);
+        //printf("end pos: %f", end_pos.x);
 
         sge_movement_settings movement_settings_horizontal = {
                 .mode = ROTATE_PITCH_AND_YAW,
@@ -106,59 +140,73 @@ int main(void) {
                 timeBeginPeriod(1);
                 const DWORD start_time = get_current_ms_time();
 
+                sge_region *active_region = sge_region_get_active(render);
+                int regions_count;
+                sge_region **active_regions = sge_region_get_active_list(render, &regions_count);
+                for (int i = 0; i < regions_count; ++i) {
+                        printf("ACTIVE REGIONS: %i\n", i);
+                }
+                if (regions_count > 0) {
+                        printf("\n");
+                }
+
                 //do everything in here
                 if (is_key_down(KEY_ESCAPE)) {
                         //printf("PRESSED ESCAPE\n");
                 }
 
-                if (is_key_down(KEY_A)) {
-                        //printf("HOLDING A\n");
-                        //sge_camera_move_left(render);
-                }
+                //if (is_key_down(KEY_A)) {
+                //        //printf("HOLDING A\n");
+                //        //sge_camera_move_left(render);
+                //}
 
                 if (is_key_down(KEY_A)) {
                         //printf("PRESSED A ONCE\n");
-                        sge_camera_move_left(render, left_right);
+                        if (regions_count > 1) {
+                                sge_camera_move_left(render, active_regions[1], left_right);
+                        } else {
+                                sge_camera_move_left(render, active_region, left_right);
+                        }
                 }
 
                 if (is_key_down(KEY_W)) {
                         if (is_key_down(KEY_CTRL)) {
-                                sge_camera_move_forward(render, sprint_settings_horizontal);
+                                sge_camera_move_forward(render, active_region, sprint_settings_horizontal);
                         } else {
-                                sge_camera_move_forward(render, movement_settings_horizontal);
+                                sge_camera_move_forward(render, active_region, movement_settings_horizontal);
                         }
                 }
 
                 if (is_key_down(KEY_S)) {
-                        sge_camera_move_backwards(render, movement_settings_horizontal);
+                        sge_camera_move_backwards(render, active_region, movement_settings_horizontal);
                 }
 
                 if (is_key_down(KEY_D)) {
-                        sge_camera_move_right(render, left_right);
+                        sge_camera_move_right(render, active_region, left_right);
                 }
 
                 if (is_key_down(KEY_SPACE)) {
-                        sge_camera_move_up(render, movement_settings_vertical);
+                        sge_camera_move_up(render, active_region, movement_settings_vertical);
                 }
 
                 if (is_key_down(KEY_SHIFT)) {
-                        sge_camera_move_down(render, movement_settings_vertical);
+                        sge_camera_move_down(render, active_region, movement_settings_vertical);
                 }
 
                 if (is_key_pressed(KEY_ARROW_LEFT)) {
-                        sge_camera_rotate_y(render, -15);
+                        sge_camera_rotate_y(render,active_region, -15);
                 }
 
                 if (is_key_pressed(KEY_ARROW_RIGHT)) {
-                        sge_camera_rotate_y(render, 15);
+                        sge_camera_rotate_y(render, active_region, 15);
                 }
 
                 if (is_key_pressed(KEY_ARROW_UP)) {
-                        sge_camera_rotate_x(render, 15);
+                        sge_camera_rotate_x(render, active_region, 15);
                 }
 
                 if (is_key_pressed(KEY_ARROW_DOWN)) {
-                        sge_camera_rotate_x(render, -15);
+                        sge_camera_rotate_x(render, active_region, -15);
                 }
 
 
@@ -174,7 +222,7 @@ int main(void) {
 
                 if (is_mouse_down(MBUTTON_RIGHT)) {
                         hide_mouse();
-                        sge_camera_rotate(render, mouse_movement_settings);
+                        sge_camera_rotate(render, active_region, mouse_movement_settings);
                 }
 
                 if (was_mouse_down(MBUTTON_RIGHT)) {
@@ -185,7 +233,9 @@ int main(void) {
                 //printf("Current Mouse Pos: x: %d, y: %d\n", current_mouse_pos.x, current_mouse_pos.y);
                 //draw_frame(vk_context);
                 //printf("DREW 1 FRAME\n");
-                sge_update_uniform_buffer(render);
+                //sge_update_uniform_buffer(render, main_region);
+                //sge_update_uniform_buffer(render, secondary_region);
+                sge_update_uniform_buffer(render, NULL);
                 sge_draw_frame(render);
 
                 update_frame(target_fps, start_time, window);

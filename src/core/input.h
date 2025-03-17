@@ -5,6 +5,9 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "../renderer/sge_render.h"
+
+typedef struct sge_render sge_render;
 
 extern int *key_states;
 extern int *last_key_states;
@@ -177,6 +180,7 @@ int is_mouse_pressed(mouse_buttons button);
 void update_key_states();
 
 mouse_pos get_mouse_position();
+mouse_pos get_window_mouse_pos(sge_render *render, mouse_pos screen_pos);
 mouse_pos get_delta_mouse_position();
 
 void enable_input_tracking();

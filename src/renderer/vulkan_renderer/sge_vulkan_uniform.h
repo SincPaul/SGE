@@ -7,6 +7,6 @@
 
 #include "../sge_render.h"
 
-SGE_RESULT sge_vulkan_update_uniform_buffer(sge_render *render);
+SGE_RESULT sge_vulkan_update_uniform_buffer(sge_render *render, sge_region *region);
 
 #endif //SGE_VULKAN_UNIFORM_H
