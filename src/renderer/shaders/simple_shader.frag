@@ -1,7 +1,8 @@
 #version 450
 
-layout ( location = 0 ) out vec4 outColor;
+layout (location = 0) in vec4 fragColor;   // Receive color from vertex shader
+layout (location = 0) out vec4 outColor;
 
 void main() {
-    outColor = vec4(0.5, 0.9, 0.2, 1.0);
+    outColor = fragColor;  // Use the incoming color instead of hardcoded
 }

@@ -133,6 +133,13 @@ SGE_RESULT sge_update_descriptor_set(sge_render *render, sge_uniform_buffer_type
 //        return SGE_SUCCESS;
 //}
 
+SGE_RESULT sge_renderable_create_api_resources(sge_render *render, sge_renderable *renderable) {
+        if (render->sge_interface->create_renderable_resources(render, renderable) != SGE_SUCCESS) {
+                return SGE_ERROR;
+        }
+        return SGE_SUCCESS;
+}
+
 sge_mesh *create_logo_mesh(sge_render *render) {
 
         sge_vulkan_context *vk_context = (sge_vulkan_context*)render->api_context;
@@ -459,10 +466,10 @@ sge_mesh *create_logo_mesh(sge_render *render) {
         vkUnmapMemory(vk_context->device, vertex_memory);
 
         sge_mesh *mesh = allocate_memory(sizeof(sge_mesh), MEMORY_TAG_RENDERER);
-        mesh->vertex_buffer = vertex_buffer;
-        mesh->vertex_memory = vertex_memory;
-        mesh->index_buffer = VK_NULL_HANDLE;
-        mesh->index_memory = VK_NULL_HANDLE;
+        mesh->vertex_buffer.api_handle = vertex_buffer;
+        //mesh->vertex_memory = vertex_memory;
+        //mesh->index_buffer = VK_NULL_HANDLE;
+        //mesh->index_memory = VK_NULL_HANDLE;
         mesh->vertex_count = num_vertices;
         mesh->index_count = 0;
         mesh->format = format;
@@ -501,6 +508,145 @@ sge_renderable *create_logo_renderable(sge_render *render) {
         logo_renderable->mesh = logo_mesh;
 
         return logo_renderable;
+}
+
+sge_renderable *create_renderable_from_rend_file(sge_render *render, SGE_REND_FILE *file) {
+        if (file == NULL) {
+                log_event(LOG_LEVEL_FATAL, "tried to create renderable from file without passing file");
+                return NULL;
+        }
+
+        sge_renderable *renderable = allocate_memory(sizeof(sge_renderable), MEMORY_TAG_RENDERER);
+        if (renderable == NULL) {
+                log_event(LOG_LEVEL_FATAL, "Failed to allocate for renderable");
+                return NULL;
+        }
+
+        bool has_mesh = false;
+
+
+        for (int i = 0; i < file->header.section_count; ++i) {
+                SGE_REND_SECTION *section = &file->sections[i];
+
+                switch (section->section_header.type) {
+                        case SGE_SECTION_MESH: {
+                                SGE_MESH_DATA *mesh_data = sge_parse_mesh_data(section->data, section->section_header.data_size);
+                                if (mesh_data == NULL) {
+                                        log_event(LOG_LEVEL_FATAL, "failed to parse mesh data");
+                                        return NULL;
+                                }
+
+                                renderable->mesh = allocate_memory(sizeof(sge_mesh), MEMORY_TAG_RENDERER);
+                                if (renderable->mesh == NULL) {
+                                        log_event(LOG_LEVEL_FATAL, "failed allocate renderable mesh");
+                                        return NULL;
+                                }
+
+                                //NAME
+                                log_event(LOG_LEVEL_DEBUG, "copying name");
+                                copy_memory(renderable->mesh->name, section->section_header.name, sizeof(renderable->mesh->name), 0, 0);
+                                log_event(LOG_LEVEL_DEBUG, "finished copying name");
+
+                                //MESH
+                                renderable->mesh->vertex_count = mesh_data->vertex_count;
+                                renderable->mesh->vertex_size = mesh_data->vertex_size;
+                                renderable->mesh->attribute_count = mesh_data->attribute_count;
+
+                                renderable->mesh->attributes = allocate_memory(sizeof(SGE_MESH_ATTRIBUTE) * renderable->mesh->attribute_count, MEMORY_TAG_RENDERER);
+
+                                if (renderable->mesh->attributes == NULL) {
+                                        log_event(LOG_LEVEL_FATAL, "failed to allocate for attributes or no attributes specified, atleast position required");
+                                        return NULL;
+                                }
+
+                                log_event(LOG_LEVEL_DEBUG, "copying attributes");
+                                copy_memory(renderable->mesh->attributes, mesh_data->attributes, sizeof(SGE_MESH_ATTRIBUTE) * renderable->mesh->attribute_count, 0, 0);
+                                log_event(LOG_LEVEL_DEBUG, "finished copying attributes");
+
+                                renderable->mesh->vertex_buffer.size = mesh_data->vertex_count * mesh_data->vertex_size;
+                                renderable->mesh->vertex_buffer.data = allocate_memory(renderable->mesh->vertex_buffer.size, MEMORY_TAG_RENDERER);
+
+                                if (renderable->mesh->vertex_buffer.data == NULL) {
+                                        log_event(LOG_LEVEL_FATAL, "failed to allocate vertex buffer data");
+                                        return NULL;
+                                }
+
+                                log_event(LOG_LEVEL_DEBUG, "copying vertex data");
+
+                                log_event(LOG_LEVEL_DEBUG,"DEST PTR: %p", renderable->mesh->vertex_buffer.data);
+                                log_event(LOG_LEVEL_DEBUG,"SRC PTR: %p", mesh_data->vertex_data);
+                                copy_memory(renderable->mesh->vertex_buffer.data, mesh_data->vertex_data, renderable->mesh->vertex_buffer.size, 0, 0);
+                                log_event(LOG_LEVEL_DEBUG, "finished copying vertex data");
+
+                                sge_vertex_attribute *attributes = allocate_memory(
+                                    sizeof(sge_vertex_attribute) * renderable->mesh->attribute_count,
+                                    MEMORY_TAG_RENDERER
+                                );
+
+                                if (attributes == NULL) {
+                                    log_event(LOG_LEVEL_FATAL, "failed to allocate vertex attributes");
+                                    return NULL;
+                                }
+
+
+
+                                sge_vertex_format *format = allocate_memory(sizeof(sge_vertex_format), MEMORY_TAG_RENDERER);
+                                if (format == NULL) {
+                                    log_event(LOG_LEVEL_FATAL, "failed to allocate vertex format");
+                                    return NULL;
+                                }
+
+                                format->stride = renderable->mesh->vertex_size;
+                                format->attributes = attributes;
+                                format->attribute_count = renderable->mesh->attribute_count;
+
+                                renderable->mesh->format = format;
+
+
+                                has_mesh = true;
+                        } break;
+                        case SGE_SECTION_MATERIAL: {
+                                renderable->material = allocate_memory(section->section_header.data_size, MEMORY_TAG_RENDERER);
+                                if (renderable->material == NULL) {
+                                        log_event(LOG_LEVEL_FATAL, "failed to allocate for material");
+                                        return NULL;
+                                }
+
+                        } break;
+                }
+        }
+
+        if (!has_mesh) {
+                log_event(LOG_LEVEL_FATAL, "no mesh input");
+                return NULL;
+        }
+
+
+
+
+
+
+        //if (mesh_section == NULL) {
+        //        log_event(LOG_LEVEL_FATAL, "tried to load renderable without mesh");
+        //        return NULL;
+        //}
+//
+        //renderable->mesh = allocate_memory(sizeof(sge_mesh), MEMORY_TAG_RENDERER);
+        //if (renderable->mesh == NULL) {
+        //        log_event(LOG_LEVEL_FATAL, "failed to allocate mesh");
+        //        return NULL;
+        //}
+//
+        //copy_memory(renderable->mesh->name, mesh_section->section_header.name, sizeof(renderable->mesh->name), 0, 0);
+//
+        //renderable->mesh->vertex_count = mesh_section->section_header.
+
+
+        log_event(LOG_LEVEL_INFO, "creating renderable api resources");
+        sge_renderable_create_api_resources(render, renderable);
+        log_event(LOG_LEVEL_INFO, "finished creating renderable api resources");
+
+        return renderable;
 }
 
 

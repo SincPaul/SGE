@@ -150,7 +150,12 @@ SGE_RESULT sge_vulkan_draw_frame(sge_render *render) {
                 for (int r = 0; r < region->renderable_count; ++r) {
                         sge_renderable *renderable = region->renderables[r];
 
-                        VkBuffer vertex_buffer[] = {renderable->mesh->vertex_buffer};
+                        log_event(LOG_LEVEL_INFO, "Drawing mesh: vertices=%d, stride=%d, buffer=%p",
+                                renderable->mesh->vertex_count,
+                                renderable->mesh->vertex_size,
+                                renderable->mesh->vertex_buffer.api_handle);
+
+                        VkBuffer vertex_buffer[] = {renderable->mesh->vertex_buffer.api_handle};
                         VkDeviceSize offsets[] = {0};
 
                         vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffer, offsets);

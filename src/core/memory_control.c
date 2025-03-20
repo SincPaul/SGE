@@ -64,7 +64,7 @@ void *allocate_memory(const size_t size, const memory_tag tag) {
 
         char memory_message[256];
         snprintf(memory_message, sizeof(memory_message), "Allocated %d Bytes of Memory for Tag %s", size, memory_tag_to_string(tag));
-        log_event(LOG_LEVEL_INFO, memory_message);
+        //log_event(LOG_LEVEL_INFO, memory_message);
 
 
         memory_tag_usage *tag_usage = memory_tag_usage_tracker;
@@ -112,11 +112,11 @@ void *allocate_memory(const size_t size, const memory_tag tag) {
 
         char tracker_memory_message[256];
         snprintf(tracker_memory_message, sizeof(tracker_memory_message), "Memory Tracker now uses %d Bytes of Memory", tracker_memory_usage);
-        log_event(LOG_LEVEL_INFO, tracker_memory_message);
+        //log_event(LOG_LEVEL_INFO, tracker_memory_message);
 
         char total_memory_usage_message[256];
         snprintf(total_memory_usage_message, sizeof(total_memory_usage_message), "Total Memory Used: %d", total_memory_usage);
-        log_event(LOG_LEVEL_INFO, total_memory_usage_message);
+        //log_event(LOG_LEVEL_INFO, total_memory_usage_message);
 
         return ptr;
 }
@@ -193,18 +193,18 @@ void free_memory(void *ptr,const memory_tag tag) {
                         char freed_memory_msg[256];
                         snprintf(freed_memory_msg, sizeof(freed_memory_msg), "Freed %d Bytes of Memory for Tag %s",
                                 to_free->size, memory_tag_to_string(tag));
-                        log_event(LOG_LEVEL_INFO, freed_memory_msg);
+                        //log_event(LOG_LEVEL_INFO, freed_memory_msg);
 
 
                         char tracker_memory_message[256];
                         snprintf(tracker_memory_message, sizeof(tracker_memory_message), "Memory Tracker now uses %d Bytes of Memory",
                                 tracker_memory_usage);
-                        log_event(LOG_LEVEL_INFO, tracker_memory_message);
+                        //log_event(LOG_LEVEL_INFO, tracker_memory_message);
 
                         char total_memory_usage_message[256];
                         snprintf(total_memory_usage_message, sizeof(total_memory_usage_message), "Total Memory Used: %d",
                                 total_memory_usage);
-                        log_event(LOG_LEVEL_INFO, total_memory_usage_message);
+                        //log_event(LOG_LEVEL_INFO, total_memory_usage_message);
 
                         free(to_free);
                         free(ptr);

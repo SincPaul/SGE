@@ -5,6 +5,7 @@
 #ifndef SGE_MATH_H
 #define SGE_MATH_H
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct vec3 {
         float x;
@@ -48,5 +49,7 @@ vec4 sge_m4_transform_vec4(m4 matrix, vec4 vec);
 
 
 size_t squared(size_t num);
+
+extern uint32_t crc32_table[256];
 
 #endif //SGE_MATH_H

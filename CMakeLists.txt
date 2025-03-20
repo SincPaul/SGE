@@ -35,6 +35,13 @@ add_library(SGE
         src/renderer/vulkan_renderer/sge_vulkan_uniform.c
         src/renderer/vulkan_renderer/sge_vulkan_descriptor.c
         src/renderer/sge_region.c
+        src/renderer/sge_render_file.c
+        src/SGE.c
+        src/SGE.h
+        src/renderer/sge_scene_file.c
+        src/renderer/sge_scene_file.h
+        src/renderer/vulkan_renderer/sge_vulkan_renderables.c
+        src/renderer/vulkan_renderer/sge_vulkan_renderables.h
 )
 
 add_executable(TEST test.c

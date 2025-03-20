@@ -21,7 +21,8 @@ sge_renderer_interface sge_vulkan_interface = {
         .allocate_buffer_memory = sge_vulkan_allocate_buffer,
         .create_descriptor_pool = sge_vulkan_descriptor_pool_create,
         .allocate_descriptor_set = sge_vulkan_descriptor_set,
-        .update_descriptor_set = sge_vulkan_descriptor_update
+        .update_descriptor_set = sge_vulkan_descriptor_update,
+        .create_renderable_resources = sge_vulkan_create_renderable_resources
 };
 
 

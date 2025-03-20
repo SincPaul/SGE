@@ -28,6 +28,7 @@ typedef struct vulkan_app_info {
 #include "sge_vulkan_pipeline.h"
 #include "sge_vulkan_descriptor.h"
 #include "sge_vulkan_uniform.h"
+#include "sge_vulkan_renderables.h"
 
 
 typedef struct swapchain_infos {

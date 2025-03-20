@@ -4,15 +4,20 @@
 
 #ifndef SGE_RENDER_H
 #define SGE_RENDER_H
+
+
 #include <stdbool.h>
 
 #include "../utils/sge_math.h"
 #include "../core/os_specific/sge_window.h"
+#include "../SGE.h"
+#include "sge_render_file.h"
+
+#include <stdio.h>
 #include <vulkan/vulkan.h>
 
 //#include "../core/logging.h"
 //#include "../core/memory_control.h"
-
 
 typedef enum sge_render_api {
         RENDER_API_VULKAN,
@@ -20,25 +25,28 @@ typedef enum sge_render_api {
         RENDER_API_OPENGL
 } render_api;
 
-typedef enum SGE_RESULT {
-        SGE_SUCCESS = 0,
-        SGE_ERROR,
-        SGE_RESIZE,
-        SGE_ERROR_INVALID_API,
-        SGE_ERROR_FAILED_ALLOCATION,
-        SGE_UNSUPPORTED_SYSTEM
-} SGE_RESULT;
+typedef enum SGE_GEOMETRY_TYPE {
+        SGE_GEOMETRY_2D,
+        SGE_GEOMETRY_3D
+} SGE_GEOMETRY_TYPE;
+
+typedef struct sge_buffer {
+        void            *api_handle;
+        size_t          size;
+        void            *data;
+} sge_buffer;
 
 typedef struct sge_vertex_attribute {
-        uint32_t location;
-        VkFormat format;
-        uint32_t offset;
+        uint32_t        location;
+        uint32_t        format;
+        uint32_t        components;
+        uint32_t        offset;
 } sge_vertex_attribute;
 
 typedef struct sge_vertex_format {
-        uint32_t stride;
-        sge_vertex_attribute *attributes;
-        size_t attribute_count;
+        uint32_t                stride;
+        sge_vertex_attribute    *attributes;
+        size_t                  attribute_count;
 } sge_vertex_format;
 
 typedef struct sge_shader { //SPIR-V vulkan, HLSL directx, GLSL opengl
@@ -46,30 +54,34 @@ typedef struct sge_shader { //SPIR-V vulkan, HLSL directx, GLSL opengl
         void *api_shader;
 } sge_shader;
 
+//todo use
 typedef struct sge_pipeline_settings {
         sge_shader *vertex_shader;
         sge_shader *fragment_shader;
         sge_vertex_format *vertex_format;
-        VkPrimitiveTopology topology;
-        VkPolygonMode polygon_mode;
-        VkCullModeFlags cull_mode;
-        VkFrontFace front_face;
+        uint32_t topology;
+        uint32_t polygon_mode;
+        uint32_t cull_face;
+        uint32_t front_face;
 } sge_pipeline_settings;
 
 typedef struct sge_mesh {
-        VkBuffer vertex_buffer;
-        VkDeviceMemory vertex_memory;
-        VkBuffer index_buffer;
-        VkDeviceMemory index_memory;
-        uint32_t vertex_count;
-        uint32_t index_count;
-        sge_vertex_format *format;
+        sge_buffer              vertex_buffer;
+        sge_buffer              index_buffer;
+        uint32_t                vertex_size;
+        uint32_t                attribute_count;
+        uint32_t                vertex_count;
+        uint32_t                index_count;
+        SGE_MESH_ATTRIBUTE      *attributes;
+        sge_vertex_format       *format;
+        char                    name[64];
 } sge_mesh;
 
 typedef struct sge_material {
         sge_shader      *vertex_shader;
         sge_shader      *fragment_shader;
         vec4            color;
+        char name[64];
 } sge_material;
 
 typedef struct sge_renderable {
@@ -118,6 +130,7 @@ typedef struct sge_renderer_interface {
         SGE_RESULT (*create_descriptor_pool)(sge_render *render, void *pool_ptr);
         SGE_RESULT (*allocate_descriptor_set)(sge_render *render, void *descriptor_ptr, void *layout_ptr, void *descriptor_pool);
         SGE_RESULT (*update_descriptor_set)(sge_render *render, sge_uniform_buffer_type *buffer);
+        SGE_RESULT (*create_renderable_resources)(sge_render *render, sge_renderable *renderable);
 } sge_renderer_interface;
 
 #include "sge_camera.h"
@@ -175,12 +188,12 @@ SGE_RESULT sge_begin_frame(sge_render *render);
 SGE_RESULT sge_draw(sge_render *render, sge_renderable *renderable, sge_pipeline *pipeline);
 SGE_RESULT sge_end_frame(sge_render *render);
 
-sge_mesh *sge_mesh_create(sge_render *render, void *vertices, uint32_t vertex_size, uint32_t vertex_count, uint32_t *indices, uint32_t index_count, sge_vertex_format *format);
-sge_shader *sge_shader_create();
+//sge_mesh *sge_mesh_create(sge_render *render, void *vertices, uint32_t vertex_size, uint32_t vertex_count, uint32_t *indices, uint32_t index_count, sge_vertex_format *format);
+//sge_shader *sge_shader_create();
 sge_renderable *sge_renderable_create(sge_mesh *mesh, sge_material *material);
-sge_pipeline *get_default_pipeline();
-sge_pipeline *sge_pipeline_create();
-SGE_RESULT sge_render_shutdown(sge_render *render);
+//sge_pipeline *get_default_pipeline();
+//sge_pipeline *sge_pipeline_create();
+//SGE_RESULT sge_render_shutdown(sge_render *render);
 
 
 SGE_RESULT sge_move_forward(sge_render *render);
@@ -197,12 +210,16 @@ sge_mesh *create_logo_mesh(sge_render *render);
 sge_renderable *create_logo_renderable(sge_render *render);
 
 
+#include "sge_render_file.h"
+sge_renderable *create_renderable_from_rend_file(sge_render *render, SGE_REND_FILE *file);
+
+
 SGE_RESULT sge_create_buffer(sge_render *render, void **buffer_ptr);
 SGE_RESULT sge_allocate_buffer(sge_render *render, void **memory_ptr, void *buffer);
 SGE_RESULT sge_create_descriptor_pool(sge_render *render, void *pool_ptr);
 SGE_RESULT sge_allocate_descriptor_set(sge_render *render, void *descriptor_ptr, void *layout_ptr, void *descriptor_pool);
 SGE_RESULT sge_update_descriptor_set(sge_render *render, sge_uniform_buffer_type *buffer);
 
-
+SGE_RESULT sge_renderable_create_api_resources(sge_render *render, sge_renderable *renderable);
 #endif //SGE_RENDER_H
 

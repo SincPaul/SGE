@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <windows.h>
 #include <core/input.h>
+#include <renderer/sge_render_file.h>
 #include <renderer/vulkan_renderer/vulkan_renderer.h>
 #include <vulkan/vulkan_core.h>
 #include "renderer/sge_render.h"
@@ -19,7 +20,7 @@
 #include "utils/steinutils.h"
 
 void seg_fault_handler(int sig) {
-       log_event(LOG_LEVEL_INFO, "SEG FAULT OCCURED");
+       log_event(LOG_LEVEL_FATAL, "SEG FAULT OCCURED");
 }
 
 int main(void) {
@@ -79,7 +80,7 @@ int main(void) {
         sge_renderable *logo_renderable = create_logo_renderable(render);
         //sge_add_renderable(render, logo_renderable);
 
-        sge_region_add_renderable(main_region, logo_renderable);
+        //sge_region_add_renderable(main_region, logo_renderable);
 
         sge_region_settings second_setting_3d = {
                 .auto_update = true,
@@ -96,7 +97,7 @@ int main(void) {
 
         sge_region *secondary_region = sge_region_create(render, &second_setting_3d);
 
-        sge_region_add_renderable(secondary_region, logo_renderable);
+        //sge_region_add_renderable(secondary_region, logo_renderable);
 
         //m4 test_matrix =
         //m4 transformation_matrix;
@@ -113,7 +114,7 @@ int main(void) {
         //m4 temp;
         //sge_m4_multiply(temp, translation_matrix, x_rotation_matrix);
         //sge_m4_multiply(transformation_matrix, temp, y_rotation_matrix);
-//
+        //
         //vec4 init_pos = {0, 1, 0, 1};
         //vec4 end_pos = sge_m4_transform_vec4(transformation_matrix, init_pos);
         //printf("end pos: %f", end_pos.x);
@@ -135,6 +136,129 @@ int main(void) {
                 .delta_speed = 0.5
         };
 
+
+
+
+
+        //SGE_REND_SECTION sections[2];
+//
+        //strncpy(sections[0].section_header.name, "MESHI MESH", sizeof(sections[1].section_header.name) - 1);
+        //sections[0].section_header.name[sizeof(sections[1].section_header.name) - 1] = '\0';
+        //sections[0].section_header.type = 1;  // 1 = Mesh (for example)
+        //sections[0].section_header.data_size = 9 * sizeof(float);
+        //sections[0].section_header.extension_count = 0;
+        //sections[0].section_header.extension_size = 0;
+        //sections[0].section_header.extensions = NULL;
+        //sections[0].data = allocate_memory(sections[0].section_header.data_size, MEMORY_TAG_RENDERER);
+        //if (sections[0].data == NULL) {
+        //    fprintf(stderr, "Failed to allocate mesh data\n");
+        //    return -1;
+        //}
+        //float triangleVertices[9] = {
+        //     0.0f, 0.0f, 0.0f,  // Vertex 1  0.0 0.0 0.0
+        //     1.0f, 0.0f, 0.0f,  // Vertex 2
+        //     0.0f, 1.0f, 0.0f   // Vertex 3
+        //};
+        //memcpy(sections[0].data, triangleVertices, sections[0].section_header.data_size);
+//
+        //strncpy(sections[1].section_header.name, "Materialo", sizeof(sections[1].section_header.name) - 1);
+        //sections[1].section_header.name[sizeof(sections[1].section_header.name) - 1] = '\0';
+        //sections[1].section_header.type = 2;
+        //sections[1].section_header.data_size = 4 * sizeof(float);
+        //sections[1].section_header.extension_count = 0;
+        //sections[1].section_header.extension_size = 0;
+        //sections[1].section_header.extensions = NULL;
+        //sections[1].data = allocate_memory(sections[1].section_header.data_size, MEMORY_TAG_RENDERER);
+        //if (sections[1].data == NULL) {
+        //    fprintf(stderr, "Failed to allocate material data\n");
+        //    free(sections[0].data);
+        //    return -1;
+        //}
+        //float blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+        //memcpy(sections[1].data, blueColor, sections[1].section_header.data_size);
+
+
+        SGE_MESH_ATTRIBUTE attributes[2] = {
+                {
+                        .type = SGE_ATTRIBUTE_POSITION,
+                        .format = SGE_FORMAT_FLOAT32,
+                        .components = 3,
+                        .offset = 0,
+                },
+                {
+                        .type = SGE_ATTRIBUTE_COLOR,
+                        .format = SGE_FORMAT_UINT8,
+                        .components = 4,
+                        .offset = 12
+                }
+        };
+
+        typedef struct {
+                float position[3];
+                uint8_t color[4];
+        } ColoredVertex;
+
+        ColoredVertex vertices[] = {
+                {
+                        .position = {-0.5f, 0.0f, 0.0f},
+                        .color = {255, 0, 0, 255}
+                },
+                {
+                        .position = {0.5f, 0.0f, 0.0f},
+                        .color = {0, 255, 0, 255}
+                },
+                {
+                        .position = {0.0f, -0.5f, 0.0f},
+                        .color = {0, 0, 255, 255}
+                }
+        };
+
+        SGE_REND_SECTION *triangle_test_mesh_section = sge_create_mesh_section(
+                "test triangle",
+                vertices,
+                3,
+                16,
+                attributes,
+                2,
+                NULL,
+                0
+        );
+
+        SGE_REND_SECTION sections[] = { *triangle_test_mesh_section };
+
+        SGE_RESULT result = sge_rend_save("test", sections, 1);
+        if (result != SGE_SUCCESS) {
+            fprintf(stderr, "Failed to save render file\n");
+        } else {
+            printf("Render file saved successfully.\n");
+        }
+
+
+
+        SGE_REND_FILE *file = NULL;
+        sge_rend_load("test.sgerend", &file);
+
+        for (int i = 0; i < file->header.section_count; ++i) {
+                SGE_REND_SECTION *section = &file->sections[i];
+                printf("Section %d (type: %d, size: %zu bytes):\n",
+                       i, section->section_header.type, section->section_header.data_size);
+
+                unsigned char *bytes = (unsigned char*)section->data;
+                for (size_t j = 0; j < section->section_header.data_size; j++) {
+                        printf("%02X ", bytes[j]);
+                        if ((j + 1) % 16 == 0) printf("\n");
+                }
+                printf("\n\n");
+        }
+
+        log_event(LOG_LEVEL_INFO, "creating test renderable");
+        sge_renderable *test = create_renderable_from_rend_file(render, file);
+        log_event(LOG_LEVEL_INFO, "finished creating test renderable");
+
+        sge_region_add_renderable(main_region, test);
+
+        //printf("%p\n", file->sections[1].data);
+
         while (!window_should_close()) {
                 //do stuff
                 timeBeginPeriod(1);
@@ -143,12 +267,12 @@ int main(void) {
                 sge_region *active_region = sge_region_get_active(render);
                 int regions_count;
                 sge_region **active_regions = sge_region_get_active_list(render, &regions_count);
-                for (int i = 0; i < regions_count; ++i) {
-                        printf("ACTIVE REGIONS: %i\n", i);
-                }
-                if (regions_count > 0) {
-                        printf("\n");
-                }
+                //for (int i = 0; i < regions_count; ++i) {
+                //        printf("ACTIVE REGIONS: %i\n", i);
+                //}
+                //if (regions_count > 0) {
+                //        printf("\n");
+                //}
 
                 //do everything in here
                 if (is_key_down(KEY_ESCAPE)) {
@@ -162,11 +286,7 @@ int main(void) {
 
                 if (is_key_down(KEY_A)) {
                         //printf("PRESSED A ONCE\n");
-                        if (regions_count > 1) {
-                                sge_camera_move_left(render, active_regions[1], left_right);
-                        } else {
-                                sge_camera_move_left(render, active_region, left_right);
-                        }
+                        sge_camera_move_left(render, active_region, left_right);
                 }
 
                 if (is_key_down(KEY_W)) {

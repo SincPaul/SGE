@@ -56,23 +56,31 @@ SGE_RESULT sge_vulkan_pipeline_create(sge_render *render) {
 
         VkVertexInputBindingDescription binding_description = {
                 .binding = 0,
-                .stride = sizeof(float) * 3,
+                .stride = sizeof(float) * 3 + 4,
                 .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             };
 
-        VkVertexInputAttributeDescription attribute_description = {
-                .binding = 0,
-                .location = 0,
-                .format = VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = 0,
-            };
+        VkVertexInputAttributeDescription attribute_descriptions[2] = {
+                {
+                        .binding = 0,
+                        .location = 0,
+                        .format = VK_FORMAT_R32G32B32_SFLOAT,
+                        .offset = 0,
+                },
+                {
+                        .binding = 0,
+                        .location = 1,
+                        .format = VK_FORMAT_R8G8B8A8_UNORM,
+                        .offset = 12,
+                }
+        };
 
         VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info = {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
                 .vertexBindingDescriptionCount = 1,
                 .pVertexBindingDescriptions = &binding_description,
-                .vertexAttributeDescriptionCount = 1,
-                .pVertexAttributeDescriptions = &attribute_description,
+                .vertexAttributeDescriptionCount = 2,
+                .pVertexAttributeDescriptions = attribute_descriptions,
         };
 
         VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info = {
