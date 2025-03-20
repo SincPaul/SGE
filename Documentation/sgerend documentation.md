@@ -1,5 +1,14 @@
-**Little Endian**<br>
+**SGEREND**
+
+SGEREND is a binary file format to structed store and organize 3D rendering Data. <br>
+It is little Endian encoded and starts with a global header that leaves space for future extensions.<br>
+After that an amount of sections follows where Aspects of a Renering object are defined, such as meshes, textures and index buffer.
+
+sgerend is meant to be used for SGE (Stein Game Engine) 
+
 **Header 86 Byte excluding extension data**
+
+Each sgerend file starts with an 86 Byte header(excluding extension data), that includes metadata, such as the version, section count and a checksum for data integrity
 
 | Offset | Size          | Name                   | Description      |
 |:-------|:--------------|:-----------------------|:-----------------|
@@ -17,6 +26,12 @@
 ---------------------------------------------------------------------------------------------
 
 **Section Header 88 Byte excluding Extension data**
+
+Each Section Starts with an 88 Byte Header(exluding extensions), that defines metadata <br>
+such as the type (mesh, material, ...), offset in the file size and a checksum for data integrity
+
+After the Header the Data starts where each type has a different Section, with different Metadata <br>
+Each defined below(partially for now)
 
 | Offset | Size          | Name                    | Description                    |
 |:-------|:--------------|:------------------------|:-------------------------------|
