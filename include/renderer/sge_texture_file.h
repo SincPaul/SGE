@@ -26,6 +26,12 @@ typedef enum SGE_TEXTURE_BODY_INCLUDE_TYPE {
         SGE_TEXTURE_BODY_INCLUDE_TYPE_EMBEDDED = 1
 } SGE_TEXTURE_BODY_INCLUDE_TYPE;
 
+typedef struct sge_texture_extension {
+        uint16_t                type;
+        uint32_t                data_size;
+        uint8_t*                data;
+} sge_texture_extension;
+
 typedef struct sge_texture_section_header {
         uint8_t                 section_type;
         uint64_t                section_offset;
@@ -36,7 +42,7 @@ typedef struct sge_texture_section_header {
         uint64_t                last_modified_timestamp;
         size_t                  section_extension_size;
         uint16_t                section_extension_count;
-        void                    *section_extension_data;
+        sge_texture_extension   *extensions;
         uint32_t                section_checksum;
 } sge_texture_section_header;
 
@@ -69,11 +75,7 @@ typedef struct sge_texture_section {
         sge_parsed_section_data         parsed_data;
 } sge_texture_section;
 
-typedef struct sge_texture_extension {
-        uint16_t                type;
-        uint32_t                data_size;
-        uint8_t*                data;
-} sge_texture_extension;
+
 
 typedef struct sge_texture_header {
         uint16_t                major_version;
@@ -110,6 +112,9 @@ SGE_RESULT sge_texture_add_section(sge_texture *texture, sge_texture_section *se
 
 
 SGE_RESULT sge_texture_save(char *filename, sge_texture *texture, int flags);
-sge_texture *sge_texture_load();
+sge_texture *sge_texture_load(char *filepath);
+
+
+SGE_RESULT sge_texture_parse_color_section(sge_parsed_section_data *parsed_output, void *raw_data, size_t data_size);
 
 #endif //SGE_TEXTURE_FILE_H

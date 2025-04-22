@@ -4,7 +4,9 @@
 
 #include "utils/sge_utils.h"
 
+#include <ctype.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "core/sge_internal_logging.h"
 #include <stdlib.h>
@@ -136,4 +138,30 @@ void *set_next_pointer(void *node, void *target_ptr, const size_t next_offset, s
         *next_ptr = target_ptr;
 
         return node;
+}
+
+
+void sge_hexdump(const void *data, size_t size) {
+        const uint8_t *byte_data = (const uint8_t *)data;
+
+        for (size_t i = 0; i < size; i += 16) {
+                printf("%08zx  ", i);
+
+                for (size_t j = 0; j < 16; ++j) {
+                        if (i + j < size) {
+                                printf("%02x ", byte_data[i + j]);
+                        } else {
+                                printf("   ");
+                        }
+                }
+
+                printf(" ");
+
+                for (size_t j = 0; j < 16 && i + j < size; ++j) {
+                        uint8_t c = byte_data[i + j];
+                        printf("%c", isprint(c) ? c : '.');
+                }
+
+                printf("\n");
+        }
 }

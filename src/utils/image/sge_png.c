@@ -42,7 +42,7 @@ SGE_RESULT sge_png_parse_data(char *filename, sge_png_metadata *metadata) {
         }
         FILE *fd = fopen(filename, "rb");
         if (!fd) {
-                log_internal_event(LOG_LEVEL_ERROR, "%s: tried parsing png but no valid file passed", function_name);
+                log_internal_event(LOG_LEVEL_ERROR, "%s: tried parsing png but no valid file passed, `%s`", function_name, filename);
                 return SGE_INVALID_API_CALL;
         }
 

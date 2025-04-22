@@ -50,32 +50,7 @@ sge_scene *sge_scene_create(char *scene_name, char *author_name, char *descripti
 
         return scene;
 }
-void sge_hexdump(const void *data, size_t size) {
-        const uint8_t *byte_data = (const uint8_t *)data;
 
-        for (size_t i = 0; i < size; i += 16) {
-                printf("%08zx  ", i); // Print offset
-
-                // Print hex bytes
-                for (size_t j = 0; j < 16; ++j) {
-                        if (i + j < size) {
-                                printf("%02x ", byte_data[i + j]);
-                        } else {
-                                printf("   "); // padding
-                        }
-                }
-
-                printf(" ");
-
-                // Print ASCII representation
-                for (size_t j = 0; j < 16 && i + j < size; ++j) {
-                        uint8_t c = byte_data[i + j];
-                        printf("%c", isprint(c) ? c : '.');
-                }
-
-                printf("\n");
-        }
-}
 
 SGE_RESULT sge_scene_save(char *filename, sge_scene *scene) {
         if (!filename || !scene) {
